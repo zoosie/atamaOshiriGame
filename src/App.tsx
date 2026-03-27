@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import check from "./utils/check";
-import { pickTwoChars, pickWords } from "./utils/pickWords";
+import { loadWordDict, pickTwoChars, pickWords } from "./utils/pickWords";
+import type { WordDict } from "./utils/pickWords";
 import { CORRECT } from "./constractions/const";
 
 export interface targetWordListProps {
@@ -12,6 +13,7 @@ export interface targetWordListProps {
 }
 
 function App() {
+  const [dict, setDict] = useState<WordDict | null>(null);
   const [targetWordList, setTargetWordList] = useState<targetWordListProps[]>(
     [],
   );
@@ -22,6 +24,11 @@ function App() {
   const isComposing = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 起動時に辞書をロード
+  useEffect(() => {
+    loadWordDict().then(setDict);
+  }, []);
+
   function reset() {
     setAtamaText("");
     setOshiriText("");
@@ -31,12 +38,13 @@ function App() {
     if (inputRef.current) inputRef.current.value = "";
   }
 
-  // サーバーから今回のお題ワードを1件ピックアップ
+  // 今回のお題ワードを1件ピックアップ
   async function pickWord() {
+    if (!dict) return;
     const { atama, oshiri } = pickTwoChars();
     setAtamaText(atama);
     setOshiriText(oshiri);
-    const matched = await pickWords(atama, oshiri, setTargetWordList);
+    const matched = await pickWords(atama, oshiri, dict, setTargetWordList);
     if (matched.length === 0) {
       // 頭+お尻の組み合わせワードが存在しなければ再施行
       await pickWord();
@@ -96,11 +104,11 @@ function App() {
           // 正解の場合
           targetWordList.length > 1 ? (
             <>
-              <p>回答は他に</p>
+              <p>正解は他に</p>
               {correctAnswers}
             </>
           ) : (
-            <p>正解はこれだけでした！</p>
+            <p>正解はこれだけ！</p>
           )
         ) : (
           // 不正解の場合
@@ -121,8 +129,9 @@ function App() {
             reset();
             pickWord();
           }}
+          disabled={!dict}
         >
-          はじめる
+          {dict ? "はじめる" : "読み込み中..."}
         </button>
         <div style={{ display: "flex" }}>
           <p>{atamaText}</p>
@@ -136,11 +145,12 @@ function App() {
               isComposing.current = false;
               const filtered = filterHiragana(e.currentTarget.value);
               e.currentTarget.value = filtered; // 漢字を除去してひらがなのみ表示
-              if (filtered !== "") {
+              if (filtered !== "" && dict) {
                 const fullWordString = atamaText + filtered + oshiriText;
                 setFullWord(fullWordString);
                 check({
                   fullWord: fullWordString,
+                  dict,
                   setResult,
                 });
               }
