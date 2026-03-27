@@ -14,9 +14,10 @@ export type WordDict = Map<string, targetWordListProps>;
 export async function loadWordDict(topic: topicProps): Promise<WordDict> {
   const dict: WordDict = new Map();
   const csvFiles = [];
-  if (topic.pokemon_name) csvFiles.push("/data/POKEMON_ALL.csv");
-  if (topic.item) csvFiles.push("/data/ITEM_ALL.csv");
-  if (topic.waza) csvFiles.push("/data/WAZA_ALL.csv");
+  const base = import.meta.env.BASE_URL;
+  if (topic.pokemon_name) csvFiles.push(`${base}data/POKEMON_ALL.csv`);
+  if (topic.item) csvFiles.push(`${base}data/ITEM_ALL.csv`);
+  if (topic.waza) csvFiles.push(`${base}data/WAZA_ALL.csv`);
 
   for (const file of csvFiles) {
     const res = await fetch(file);
