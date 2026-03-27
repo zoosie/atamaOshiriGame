@@ -12,6 +12,12 @@ export interface targetWordListProps {
   reading: string;
 }
 
+export interface topicProps {
+  pokemon_name: boolean;
+  item: boolean;
+  waza: boolean;
+}
+
 function App() {
   const [dict, setDict] = useState<WordDict | null>(null);
   const [targetWordList, setTargetWordList] = useState<targetWordListProps[]>(
@@ -21,13 +27,18 @@ function App() {
   const [oshiriText, setOshiriText] = useState<string>("お尻");
   const [fullWord, setFullWord] = useState<string>("");
   const [result, setResult] = useState<string | null>(null);
+  const [topic, setTopic] = useState<topicProps>({
+    pokemon_name: true,
+    item: false,
+    waza: false,
+  });
   const isComposing = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 起動時に辞書をロード
   useEffect(() => {
-    loadWordDict().then(setDict);
-  }, []);
+    loadWordDict(topic).then(setDict);
+  }, [topic]);
 
   function reset() {
     setAtamaText("");
@@ -58,6 +69,12 @@ function App() {
       .join("");
   }
 
+  const handleTopicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const targetId = e.target.id as keyof topicProps;
+    console.log(targetId);
+    setTopic({ ...topic, [targetId]: !topic[targetId] });
+  };
+
   /**
    * 回答の属性を表示
    */
@@ -70,6 +87,7 @@ function App() {
       </p>
     );
   }
+
   /**
    * 回答後の結果表示
    * @param result - 正解/不正解の文字列。nullの場合は何も表示しない
@@ -108,7 +126,7 @@ function App() {
               {correctAnswers}
             </>
           ) : (
-            <p>正解はこれだけ！</p>
+            <p>正解はこのひとつだけ！</p>
           )
         ) : (
           // 不正解の場合
@@ -124,6 +142,35 @@ function App() {
   return (
     <>
       <section id="center">
+        <div style={{ display: "flex", flexDirection: "row", gap: "25px" }}>
+          <label key={"pokemon_name"}>
+            <input
+              id={"pokemon_name"}
+              type="checkbox"
+              checked={topic.pokemon_name}
+              onChange={handleTopicChange}
+            />
+            ポケモンの名前
+          </label>
+          <label key={"item"}>
+            <input
+              id={"item"}
+              type="checkbox"
+              checked={topic.item}
+              onChange={handleTopicChange}
+            />
+            アイテム
+          </label>
+          <label key={"waza"}>
+            <input
+              id={"waza"}
+              type="checkbox"
+              checked={topic.waza}
+              onChange={handleTopicChange}
+            />
+            わざ
+          </label>
+        </div>
         <button
           onClick={() => {
             reset();
@@ -138,6 +185,7 @@ function App() {
           <input
             type="text"
             ref={inputRef}
+            disabled={targetWordList.length === 0}
             onCompositionStart={() => {
               isComposing.current = true;
             }}

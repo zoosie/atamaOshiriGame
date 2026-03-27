@@ -1,4 +1,5 @@
 import type { targetWordListProps } from "../App";
+import type { topicProps } from "../App";
 
 interface pickTwoCharsProps {
   atama: string;
@@ -10,9 +11,12 @@ export type WordDict = Map<string, targetWordListProps>;
 /**
  * CSVファイルをfetchして辞書Mapを構築する
  */
-export async function loadWordDict(): Promise<WordDict> {
+export async function loadWordDict(topic: topicProps): Promise<WordDict> {
   const dict: WordDict = new Map();
-  const csvFiles = ["/data/POKEMON_ALL.csv", "/data/ITEM_ALL.csv"];
+  const csvFiles = [];
+  if (topic.pokemon_name) csvFiles.push("/data/POKEMON_ALL.csv");
+  if (topic.item) csvFiles.push("/data/ITEM_ALL.csv");
+  if (topic.waza) csvFiles.push("/data/WAZA_ALL.csv");
 
   for (const file of csvFiles) {
     const res = await fetch(file);
@@ -67,9 +71,7 @@ export async function pickWords(
 ): Promise<targetWordListProps[]> {
   if (!atama) return [];
   const allWords: targetWordListProps[] = [];
-  dict.forEach((v) => {
-    v.reading.startsWith(atama) && allWords.push(v);
-  });
+  dict.forEach((v) => v.reading.startsWith(atama) && allWords.push(v));
   const matched = allWords.filter(
     (v: { reading: string }) => v.reading.slice(-1) === oshiri,
   );
