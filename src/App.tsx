@@ -152,25 +152,25 @@ function App() {
         <div style={{ display: "flex", flexDirection: "row", gap: "25px" }}>
           <label key={"pokemon_name"}>
             <input
-              id={"pokemon_name"}
+              id="pokemon_name"
               type="checkbox"
               checked={topic.pokemon_name}
               onChange={handleTopicChange}
             />
             ポケモンの名前
           </label>
-          <label key={"item"}>
+          <label key="item">
             <input
-              id={"item"}
+              id="item"
               type="checkbox"
               checked={topic.item}
               onChange={handleTopicChange}
             />
             アイテム
           </label>
-          <label key={"waza"}>
+          <label key="waza">
             <input
-              id={"waza"}
+              id="waza"
               type="checkbox"
               checked={topic.waza}
               onChange={handleTopicChange}
