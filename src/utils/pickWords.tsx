@@ -76,7 +76,6 @@ export async function pickWords(
   const matched = allWords.filter(
     (v: { reading: string }) => v.reading.slice(-1) === oshiri,
   );
-  console.log(matched);
   setTargetWordList(matched);
   return matched;
 }

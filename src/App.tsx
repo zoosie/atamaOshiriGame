@@ -3,7 +3,7 @@ import "./App.css";
 import check from "./utils/check";
 import { loadWordDict, pickTwoChars, pickWords } from "./utils/pickWords";
 import type { WordDict } from "./utils/pickWords";
-import { CORRECT } from "./constractions/const";
+import { CORRECT, DISCORRECT } from "./constractions/const";
 
 export interface targetWordListProps {
   basic_form: string;
@@ -71,7 +71,6 @@ function App() {
 
   const handleTopicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const targetId = e.target.id as keyof topicProps;
-    console.log(targetId);
     setTopic({ ...topic, [targetId]: !topic[targetId] });
   };
 
@@ -212,6 +211,11 @@ function App() {
           />
           <p>{oshiriText}</p>
         </div>
+        {targetWordList.length > 0 && (
+          <button onClick={() => setResult(DISCORRECT)} disabled={!dict}>
+            降参する
+          </button>
+        )}
         {showResult(result, targetWordList)}
       </section>
     </>
