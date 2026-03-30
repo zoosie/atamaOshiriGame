@@ -65,7 +65,7 @@ function App() {
   function filterHiragana(raw: string): string {
     return raw
       .split("")
-      .filter((ch) => ch.match(/^[\u3040-\u309f\u30fc]$/))
+      .filter((ch) => ch.match(/^[\u3040-\u309f\u30fc\u30fb]$/))
       .join("");
   }
 
