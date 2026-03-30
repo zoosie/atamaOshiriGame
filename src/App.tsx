@@ -116,7 +116,15 @@ function App() {
         ) : (
           <p style={{ color: "red", fontWeight: "bold" }}>{fullWord}</p>
         )}
-        <p>{result}</p>
+        <p
+          style={{
+            backgroundColor: isCorrect ? "pink" : "gray",
+            color: isCorrect ? "red" : "blue",
+            padding: "10px 20px",
+          }}
+        >
+          {result}
+        </p>
         {isCorrect ? (
           // 正解の場合
           targetWordList.length > 1 ? (
@@ -179,44 +187,51 @@ function App() {
         >
           {dict ? "はじめる" : "読み込み中..."}
         </button>
-        <div style={{ display: "flex" }}>
-          <p>{atamaText}</p>
-          <input
-            type="text"
-            ref={inputRef}
-            disabled={targetWordList.length === 0}
-            onCompositionStart={() => {
-              isComposing.current = true;
-            }}
-            onCompositionEnd={(e) => {
-              isComposing.current = false;
-              const filtered = filterHiragana(e.currentTarget.value);
-              e.currentTarget.value = filtered; // 漢字を除去してひらがなのみ表示
-              if (filtered !== "" && dict) {
-                const fullWordString = atamaText + filtered + oshiriText;
-                setFullWord(fullWordString);
-                check({
-                  fullWord: fullWordString,
-                  dict,
-                  setResult,
-                });
-              }
-            }}
-            onChange={(e) => {
-              if (isComposing.current) return;
-              // IMEなしの直接入力（ひらがな以外は除去）
-              const filtered = filterHiragana(e.currentTarget.value);
-              e.currentTarget.value = filtered;
-            }}
-          />
-          <p>{oshiriText}</p>
-        </div>
         {targetWordList.length > 0 && (
-          <button onClick={() => setResult(DISCORRECT)} disabled={!dict}>
-            降参する
-          </button>
+          <>
+            <div style={{ display: "flex" }}>
+              <p>{atamaText}</p>
+              <input
+                type="text"
+                style={{ marginBottom: "10px" }}
+                ref={inputRef}
+                disabled={targetWordList.length === 0}
+                onCompositionStart={() => {
+                  isComposing.current = true;
+                }}
+                onCompositionEnd={(e) => {
+                  isComposing.current = false;
+                  const filtered = filterHiragana(e.currentTarget.value);
+                  e.currentTarget.value = filtered; // 漢字を除去してひらがなのみ表示
+                  if (filtered !== "" && dict) {
+                    const fullWordString = atamaText + filtered + oshiriText;
+                    setFullWord(fullWordString);
+                    check({
+                      fullWord: fullWordString,
+                      dict,
+                      setResult,
+                    });
+                  }
+                }}
+                onChange={(e) => {
+                  if (isComposing.current) return;
+                  // IMEなしの直接入力（ひらがな以外は除去）
+                  const filtered = filterHiragana(e.currentTarget.value);
+                  e.currentTarget.value = filtered;
+                }}
+              />
+              <p>{oshiriText}</p>
+            </div>
+            <button
+              onClick={() => setResult(DISCORRECT)}
+              disabled={!dict || result !== null}
+              style={{ marginTop: "20px" }}
+            >
+              降参する
+            </button>
+            {showResult(result, targetWordList)}
+          </>
         )}
-        {showResult(result, targetWordList)}
       </section>
     </>
   );
